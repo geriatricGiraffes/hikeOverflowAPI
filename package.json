@@ -6,21 +6,12 @@
   },
   "description": "greenfield-silver-squirrels",
   "main": "server/server.js",
-  "scripts": {
-    "postinstall": "bower install",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  
-  
- 
   "author": "Michael Dziedzic, Dan Molitor, Aimee Rosato, Chris Patton",
   "license": "ISC",
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "bluebird": "^3.3.1",
     "body-parser": "^1.15.0",
-    "bower": "^1.7.7",
-    "chai": "*",
     "dotenv": "^2.0.0",
     "express": "^4.13.4",
     "jwt-simple": "^0.4.1",
