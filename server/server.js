@@ -23,7 +23,7 @@ var userControllers = require('./controllers/userControllers.js');
 
 var app = express();
 
-app.use(cors());
+//app.use(cors());
 app.use(function(request, response, next){
   response.append('Access-Control-Allow-Origin', request.headers.origin || '*');
   response.append('Access-Control-Allow-Credentials', 'true');
