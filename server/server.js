@@ -1,3 +1,4 @@
+ 
  // Cody recommended doing this
 // Makes it so the .env file is read locally to get API key
 // but on heroku if the NODE_ENV config var is set to production, app will look there
@@ -13,6 +14,7 @@ if(process.env.NODE_ENV !== 'production'){
 }
 
 var express = require('express');
+var cors = require('cors');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var path = require('path');
@@ -20,6 +22,16 @@ var unirest = require('unirest');
 var userControllers = require('./controllers/userControllers.js');
 
 var app = express();
+
+app.use(cors());
+// app.use(function(request, response, next){
+//   response.append('Access-Control-Allow-Origin', request.headers.origin || '*');
+//   response.append('Access-Control-Allow-Credentials', 'true');
+//   response.append('Access-Control-Allow-Methods', ['GET', 'OPTIONS', 'PUT', 'POST']);
+//   response.append('Access-Control-Allow-Headers',
+//     "X-ACCESS-TOKEN", "Access-Control-Allow-Origin", "Authorization", "Origin", "x-requested-with", "Content-Type", "Content-Range", "Content-Disposition", "Content-Description");
+//   next();
+// });
 
 // create and connect to database
 var mongoose = require('mongoose');
@@ -37,15 +49,18 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-var port = process.env.PORT || 4000;
+var port = process.env.PORT || 8100;
 
-app.use(express.static(path.join(__dirname, '../client')));
+app.use(express.static(path.join(__dirname, '../www')));
 
 app.post('/signin', userControllers.signin);
 app.post('/signup', userControllers.signup);
 app.get('/signedin', userControllers.checkAuth);
 app.get('/getUser', userControllers.getUser);
 /// trailPost function in services.js updates the trails arrays with these endpoints:
+app.get('/getUser', function(){
+  console.log("GOT EEM");
+});
 app.post('/hasDone', userControllers.hasDone);
 app.post('/wantToDo', userControllers.wantToDo);
 app.post('/moveTrails', userControllers.moveTrails);
@@ -55,14 +70,13 @@ app.post('/api/coords', function(req, res){
   var radius = req.body.radius;
   var lat = req.body.lat;
   var long = req.body.long;
+  var limit = 30;
 
 // Unirest is used to get API data, following example on trailAPI website
-  unirest.get("https://trailapi-trailapi.p.mashape.com/?lat="+lat+"&limit=20&lon="+long+"&q[activities_activity_type_name_eq]=hiking&radius="+radius)
+  unirest.get("https://trailapi-trailapi.p.mashape.com/?lat="+lat+"&"+limit+"=20&lon="+long+"&q[activities_activity_type_name_eq]=hiking&radius="+radius)
     .header("X-Mashape-Key", process.env.TRAIL_API_KEY)
     .header("Accept", "text/plain")
   .end(function(result){
-    //console.log(result.status, result.headers.activities, result.body, result.body.activities);
-    //if there are actually hikes in that area
     if(result.body.places){
       var coordinates = result.body.places.map(function(el){
         // Organize data into an object with name and coordinates properties:
@@ -76,7 +90,7 @@ app.post('/api/coords', function(req, res){
     } else {
       res.sendStatus(404);
     }
-  });  
+  });
 });
 
  app.post('/api/trailinfo', function(req, res) {
@@ -97,7 +111,7 @@ app.post('/api/coords', function(req, res){
         var placesArr = result.body.places;
         if(placesArr){
           // First, loop through places and find index of the one there the name matches the trail name
-          // Save index, and continue to get all the info you want from the API 
+          // Save index, and continue to get all the info you want from the API
           var foundIndex;
           placesArr.forEach(function(place, i){
             if(name === placesArr[i].name){
@@ -113,7 +127,7 @@ app.post('/api/coords', function(req, res){
                 description = result.body.places[foundIndex].description;
               } else {
                 description = "No description yet.";
-              }  
+              }
               city = placesArr[foundIndex].city;
               state = placesArr[foundIndex].state;
             }
@@ -129,10 +143,10 @@ app.post('/api/coords', function(req, res){
           };
 
           res.send(dataForUser);
-  
+
         } else {
           console.log("You've hit an error when trying to send data back from API.");
-          res.sendStatus(404)
+          res.sendStatus(404);
         }
       });
  });
