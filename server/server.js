@@ -24,14 +24,14 @@ var userControllers = require('./controllers/userControllers.js');
 var app = express();
 
 app.use(cors());
-// app.use(function(request, response, next){
-//   response.append('Access-Control-Allow-Origin', request.headers.origin || '*');
-//   response.append('Access-Control-Allow-Credentials', 'true');
-//   response.append('Access-Control-Allow-Methods', ['GET', 'OPTIONS', 'PUT', 'POST']);
-//   response.append('Access-Control-Allow-Headers',
-//     "X-ACCESS-TOKEN", "Access-Control-Allow-Origin", "Authorization", "Origin", "x-requested-with", "Content-Type", "Content-Range", "Content-Disposition", "Content-Description");
-//   next();
-// });
+app.use(function(request, response, next){
+  response.append('Access-Control-Allow-Origin', request.headers.origin || '*');
+  response.append('Access-Control-Allow-Credentials', 'true');
+  response.append('Access-Control-Allow-Methods', ['GET', 'OPTIONS', 'PUT', 'POST']);
+  response.append('Access-Control-Allow-Headers',
+    "X-ACCESS-TOKEN", "Access-Control-Allow-Origin", "Authorization", "Origin", "x-requested-with", "Content-Type", "Content-Range", "Content-Disposition", "Content-Description");
+  next();
+});
 
 // create and connect to database
 var mongoose = require('mongoose');
